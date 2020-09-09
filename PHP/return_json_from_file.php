@@ -6,10 +6,10 @@ $fileName = $_GET['fileName'];
 // $fileName = "../firedata/data2.txt";
 
 $bounds = array();
-// $bounds['nelat'] = $_GET['nelat'];
-// $bounds['swlon'] = $_GET['swlon'];
-// $bounds['selat'] = $_GET['selat'];
-// $bounds['selon'] = $_GET['selon'];
+$bounds['nelat'] = $_GET['nelat'];
+$bounds['swlon'] = $_GET['swlon'];
+$bounds['selat'] = $_GET['selat'];
+$bounds['selon'] = $_GET['selon'];
 // // used in scripts
 $bounds['swlat'] = $_GET['swlat'];
 $bounds['nelon'] = $_GET['nelon'];
