@@ -121,7 +121,7 @@ function getServerData(zoomchanged, numberOfDaysBack){
       csvJSON(url, function( handleData){
 
         rawServerData[numberOfDaysBack] = handleData;
-        var preSortedData = rawServerData[daysFromToday];
+        var preSortedData = rawServerData[numberOfDaysBack];
         var data = JSON.parse(preSortedData);
         jsonServerData[numberOfDaysBack] = data;
         jsonServerData[numberOfDaysBack] = arrUnique(jsonServerData[numberOfDaysBack]);
