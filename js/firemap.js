@@ -117,7 +117,7 @@ function getServerData(zoomchanged, numberOfDaysBack){
         rawServerData[numberOfDaysBack] = handleData;
         var preppedData = prepMapData(handleData, numberOfDaysBack);
         serverData[numberOfDaysBack] = preppedData;
-        serverData[numberOfDaysBack] = removeDuplicates(serverData[numberOfDaysBack]);
+
         console.log("LoadMapData ServerData");
         updateHeatMapData(numberOfDaysBack);
       });
