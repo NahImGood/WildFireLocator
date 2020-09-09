@@ -1,7 +1,7 @@
 <?php
 
 
-function convertCSVToArray($fileName, $bounds){
+function convertCSVToArray($fileName){
 
   $csv= file_get_contents($fileName);
   $array = array_map("str_getcsv", explode("\n", $csv));
