@@ -109,14 +109,13 @@ function updateHeatMapData(numberOfDaysBack){
 
 function getServerData(zoomchanged, numberOfDaysBack){
   var boundsURL = buildBoundsURL();
-
   // SENSOR_COLLECTION_REGION_DATATYPE_JULIANDAY
   var jDate = getJulianDate(numberOfDaysBack);
   // Set up of the date formate
                 //J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_2020241
   var csvToGet = "J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_"+jDate;
   var url = csvToGet + boundsURL;
-  if(serverData[numberOfDaysBack] == null || zoomchanged) {
+  //if(serverData[numberOfDaysBack] == null || zoomchanged) {
       csvJSON(url, function( handleData){
 
         rawServerData[numberOfDaysBack] = handleData;
@@ -127,7 +126,7 @@ function getServerData(zoomchanged, numberOfDaysBack){
         updateHeatMapData(numberOfDaysBack);
 
       });
-    }
+    //}
     else {
       // data is in array and can be loaded into map
       updateHeatMapData(numberOfDaysBack);
