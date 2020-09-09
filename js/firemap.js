@@ -126,11 +126,10 @@ function getServerData(zoomchanged, numberOfDaysBack){
         updateHeatMapData(numberOfDaysBack);
 
       });
-    //}
-    else {
-      // data is in array and can be loaded into map
-      updateHeatMapData(numberOfDaysBack);
-    }
+    // //}else {
+    //   // data is in array and can be loaded into map
+    //   updateHeatMapData(numberOfDaysBack);
+    // }
 
 }
 
