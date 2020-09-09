@@ -14,9 +14,6 @@ function convertCSVToArray($fileName, $bounds){
 
     //checks to make sure the offset is set
     if(isset($item[0])){
-
-      if(FindPoint( $bounds['swlat'], $bounds['nelon'], $bounds['nwlat'],
-                    $bounds['nwlon'], $item[0], $item[1])){
         $tempArry['latitude'] = $item[0];
         $tempArry['longitude'] = $item[1];
         $tempArry['bright_ti4'] = $item[2];
@@ -31,8 +28,6 @@ function convertCSVToArray($fileName, $bounds){
         $tempArry['frp'] = $item[11];
         $tempArry['daynight'] = $item[12];
         array_push($returnArray, $tempArry);
-      }
-
     }
   }
   return $returnArray;
