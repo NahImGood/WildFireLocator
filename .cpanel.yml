@@ -1,6 +1,6 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/user/public_html/
+    - export DEPLOYPATH=/home/j9u9o9v53omg/public_html/
     - /bin/cp home.html $DEPLOYPATH
     - /bin/cp css/firemap.css $DEPLOYPATH
