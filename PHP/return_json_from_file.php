@@ -21,9 +21,9 @@ require 'functions.php';
 //
 // $bounds['nelon'] = "-108.87102500000002";
 // $bounds['nwlon'] = "-129.964775";
-// "../firedata/FIRMS/noaa-20-viirs-c2/USA_contiguous_and_Hawaii/".$fileName.".txt";
+$file =  "../firedata/FIRMS/noaa-20-viirs-c2/USA_contiguous_and_Hawaii/".$fileName.".txt";
 // $fileName = "J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_2020241";
-$fireDataArray = convertCSVToArray("../firedata/FIRMS/noaa-20-viirs-c2/USA_contiguous_and_Hawaii/".$fileName.".txt");
+$fireDataArray = convertCSVToArray($file);
 // $jsonData = convertCSVToJSON($fireDataArray);
 convertCSVToJSONAndSend($fireDataArray);
 

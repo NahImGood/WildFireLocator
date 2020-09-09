@@ -9,7 +9,6 @@ function convertCSVToArray($fileName){
   // removes header
   array_splice($array, 0, 1);
 
-
   foreach($array as $key => $item){
 
     //checks to make sure the offset is set
@@ -38,20 +37,18 @@ function convertCSVToJSONAndSend($array){
   print_r($json);
 }
 
-function FindPoint($x1, $y1, $x2, $y2, $x, $y){
-      $x =  (float)($x);
-      $y =  (float)($y);
-
-
-    if ($x > $x1 and $x < $x2){
-      //echo "x";
-        if(abs($y) > abs($y1) and abs($y) < abs($y2)){
-          return true;
-        }
-    }
-
-
-    return false;
-}
+// function FindPoint($x1, $y1, $x2, $y2, $x, $y){
+//       $x =  (float)($x);
+//       $y =  (float)($y);
+//
+//
+//     if ($x > $x1 and $x < $x2){
+//       //echo "x";
+//         if(abs($y) > abs($y1) and abs($y) < abs($y2)){
+//           return true;
+//         }
+//     }
+//     return false;
+// }
 
 ?>
