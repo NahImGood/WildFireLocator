@@ -11,7 +11,7 @@ function convertCSVToArray($fileName){
   foreach($array as $key => $item){
     //checks to make sure the offset is set
     if(isset($item[0])){
-      if(InsideOrNot($lat, $lat, $bounds) == 1){
+      if(InsideOrNot($item[0], $item[1], $bounds) == 1){
         $tempArry['latitude'] = $item[0];
         $tempArry['longitude'] = $item[1];
         $tempArry['bright_ti4'] = $item[2];
@@ -37,9 +37,9 @@ function convertCSVToJSONAndSend($array){
   print_r($json);
 }
 
-function InsideOrNot($lat, $lat, $bounds){
+function InsideOrNot($lat, $lon, $bounds){
     //If 0 is within |----| (|--0--|)
-    if($lat > $bounds['nwlon'] && $lat < $bounds['nelon']){
+    if($lon > $bounds['nwlon'] && $lon < $bounds['nelon']){
         //if 0 is within ___
         //                |
         //               ___
