@@ -136,14 +136,14 @@ function buildBoundsURL(){
   var nw = new google.maps.LatLng(ne.lat(), sw.lng());
   var se = new google.maps.LatLng(sw.lat(), ne.lng());
 
-  return "&?nelat="+ne.lat()+
-          "&?nelon="+ne.lng()+
-          "&?swlat="+sw.lat()+
-          "&?swlon="+sw.lng()+
-          "&?nwlat="+nw.lat()+
-          "&?nwlon="+nw.lng()+
-          "&?selat="+se.lat()+
-          "&?selon="+se.lng();
+  return "&nelat="+ne.lat()+
+          "&nelon="+ne.lng()+
+          "&swlat="+sw.lat()+
+          "&swlon="+sw.lng()+
+          "&nwlat="+nw.lat()+
+          "&nwlon="+nw.lng()+
+          "&selat="+se.lat()+
+          "&selon="+se.lng();
 }
 
 function showDynamicDataFromDate(daysFromToday){

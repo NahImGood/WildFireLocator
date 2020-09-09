@@ -51,22 +51,6 @@ function FindPoint($x1, $y1, $x2, $y2, $x, $y){
       $x2 =  (float)($x2);
       $y2 =  (float)($y2);
 
-      // echo "X: ";
-      // print_r($x1);
-      // echo " - ";
-      // print_r($xx);
-      // echo " - ";
-      // print_r($x2);
-      // echo "<br>";
-      // echo "Y: ";
-      // print_r($y1);
-      // echo " - ";
-      // print_r($y);
-      // echo " - ";
-      // print_r($y2);
-      // echo "<br>";
-      // echo "<br>";
-
     if ($x > $x1 and $x < $x2){
       //echo "x";
         if(abs($y) > abs($y1) and abs($y) < abs($y2)){
