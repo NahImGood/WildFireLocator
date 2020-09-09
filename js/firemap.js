@@ -115,8 +115,10 @@ function getServerData(zoomchanged, numberOfDaysBack){
   if(serverData[numberOfDaysBack] == null || zoomchanged) {
       csvJSON(url, function( handleData){
         rawServerData[numberOfDaysBack] = handleData;
+        rawServerData[numberOfDaysBack] = removeDuplicates(rawServerData[numberOfDaysBack]);
         var preppedData = prepMapData(handleData, numberOfDaysBack);
         serverData[numberOfDaysBack] = preppedData;
+        serverData[numberOfDaysBack] = removeDuplicates(serverData[numberOfDaysBack]);
         console.log("LoadMapData ServerData");
         updateHeatMapData(numberOfDaysBack);
       });
@@ -126,6 +128,14 @@ function getServerData(zoomchanged, numberOfDaysBack){
       updateHeatMapData(numberOfDaysBack);
     }
 
+}
+
+function removeDuplicates(obj) {
+
+    jsonObject = obj.map(JSON.stringify);
+    uniqueSet = new Set(jsonObject);
+    uniqueArray = Array.from(uniqueSet).map(JSON.parse);
+    return uniqueArray;
 }
 
 function buildBoundsURL(){
@@ -234,7 +244,7 @@ function modulateGradient() {
 }
 
 function prepMapData(json, numberOfDaysBack){
-  // console.log(json);
+
   var data = JSON.parse(json);
   var max = data.length;
   var returnData = [];
@@ -260,7 +270,6 @@ function csvJSON(dataString, handleData){
     // url: "../firedata/data.csv",
     async: true,
     success: function (data) {
-        console.log(data);
         // Used when a CSV was being used.
         //data = $.csv.toObjects(csvd);
         // will return data to user.
