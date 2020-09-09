@@ -12,6 +12,7 @@ var rawServerData = new Array(6);
 var intialLoad;
 var bounds;
 var numberOfDaysBack = 0;
+var checkIfLoadIsNeededArray = new Array(6);
 
 function initMap(){
   getLocation();
@@ -108,14 +109,15 @@ function updateHeatMapData(numberOfDaysBack){
 }
 
 function getServerData(zoomchanged, numberOfDaysBack){
-  var boundsURL = buildBoundsURL();
-  // SENSOR_COLLECTION_REGION_DATATYPE_JULIANDAY
-  var jDate = getJulianDate(numberOfDaysBack);
-  // Set up of the date formate
-                //J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_2020241
-  var csvToGet = "J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_"+jDate;
-  var url = csvToGet + boundsURL;
-  //if(serverData[numberOfDaysBack] == null || zoomchanged) {
+  if(isLoadNeeded(numberOfDaysBack) || zoomchanged) {
+    var boundsURL = buildBoundsURL();
+    // SENSOR_COLLECTION_REGION_DATATYPE_JULIANDAY
+    var jDate = getJulianDate(numberOfDaysBack);
+    // Set up of the date formate
+                  //J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_2020241
+    var csvToGet = "J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_"+jDate;
+    var url = csvToGet + boundsURL;
+
       csvJSON(url, function( handleData){
 
         rawServerData[numberOfDaysBack] = handleData;
@@ -124,21 +126,39 @@ function getServerData(zoomchanged, numberOfDaysBack){
         console.log(preppedData);
         console.log("LoadMapData ServerData");
         updateHeatMapData(numberOfDaysBack);
-
       });
-    // //}else {
-    //   // data is in array and can be loaded into map
-    //   updateHeatMapData(numberOfDaysBack);
-    // }
-
+    }else {
+      // data is in array and can be loaded into map
+      updateHeatMapData(numberOfDaysBack);
+    }
 }
+
+function isLoadNeeded(numberOfDaysBack){
+  var ne = bounds.getNorthEast(); // LatLng of the north-east corner
+  var sw = bounds.getSouthWest(); // LatLng of the south-west corder
+  var nw = new google.maps.LatLng(ne.lat(), sw.lng());
+  var se = new google.maps.LatLng(sw.lat(), ne.lng());
+
+  var swlat = checkIfLoadIsNeededArray[numberOfDaysBack].swlat;
+  var nelon = checkIfLoadIsNeededArray[numberOfDaysBack].nelon;
+  var nwlat = checkIfLoadIsNeededArray[numberOfDaysBack].nwlat;
+  var nwlon = checkIfLoadIsNeededArray[numberOfDaysBack].nwlon;
+
+  if(swlat < sw.lat() && nelat < ne.lat()){
+    if(nwlon < nw.lng() && nelon < ne.lng()){
+      return true;
+    }
+  }
+  return false;
+}
+
 
 function buildBoundsURL(){
   var ne = bounds.getNorthEast(); // LatLng of the north-east corner
   var sw = bounds.getSouthWest(); // LatLng of the south-west corder
   var nw = new google.maps.LatLng(ne.lat(), sw.lng());
   var se = new google.maps.LatLng(sw.lat(), ne.lng());
-
+  addToLoadNeeded(numberOfDaysBack, ne, sw, nw);
   return "&nelat="+ne.lat()+
           "&nelon="+ne.lng()+
           "&swlat="+sw.lat()+
@@ -149,10 +169,21 @@ function buildBoundsURL(){
           "&selon="+se.lng();
 }
 
+function addToLoadNeeded(numberOfDaysBack, ne, sw, nw){
+  checkIfLoadIsNeededArray[numberOfDaysBack].swlat = sw.lat();
+  checkIfLoadIsNeededArray[numberOfDaysBack].nelon = ne.lng();
+  checkIfLoadIsNeededArray[numberOfDaysBack].nwlat = nw.lat();
+  checkIfLoadIsNeededArray[numberOfDaysBack].nwlon = nw.lng();
+}
+
 function showDynamicDataFromDate(daysFromToday){
     startLoading("dateLoader");
     numberOfDaysBack = daysFromToday;
-    getServerData(false, daysFromToday);
+    if(serverData[numberOfDaysBack] == null){
+      getServerData(false, daysFromToday);
+    } else {
+      updateHeatMapData(daysFromToday);
+    }
 }
 
 function showDynamicDataFromTime(time, daysFromToday){
@@ -300,6 +331,7 @@ function getJulianDate(numberOfDaysBack){
   dateValue.innerHTML = todayformated;
   return yString.concat(day);
 }
+
 
 function startLoading(id){
   var element = document.getElementById(id);
