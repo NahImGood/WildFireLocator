@@ -12,30 +12,49 @@ var rawServerData = new Array(6);
 var intialLoad;
 
 function initMap(){
-  intialLoad = true;
-  getServerData(0);
+  loadMapData(numberOfDaysBack);
+}
+
+function getLocation(){
+  if (navigator.geolocation) {
+  return navigator.geolocation.getCurrentPosition(showPosition, cantGetLocation);
+  } else {
+    console.log("Get Location Not Available");
+  }
+}
+
+function showPosition(position) {
+  currentLat = position.coords.latitude;
+  currentLng = position.coords.longitude;
+}
+
+function cantGetLocation(){
+  currentLat = 36.7783;
+  currentLng = -119.4179;
 }
 
 function loadMapData(numberOfDaysBack){
   stopLoading("dateLoader");
-  intialLoad = false;
   var mapOptions = {
       zoom: currentZoom,
-      center: new google.maps.LatLng(37.774546, -122.433523),
+      center: new google.maps.LatLng(currentLat, currentLng),
       mapTypeId: google.maps.MapTypeId.SATELLITE,
   };
 
   map = new google.maps.Map(document.getElementById('fireMap'), mapOptions);
 
-  if(serverData[numberOfDaysBack]){
-      var pointArray = new google.maps.MVCArray(serverData[numberOfDaysBack]);
-  } else {
-    alert("Missing Data");
-  }
+  getServerData(0);
+
+
+  // if(serverData[numberOfDaysBack]){
+  //     var pointArray = new google.maps.MVCArray(serverData[numberOfDaysBack]);
+  // } else {
+  //   alert("Missing Data");
+  // }
 
   currentZoom = map.getZoom();
   heatmap = new google.maps.visualization.HeatmapLayer({
-      data: pointArray,
+      //data: pointArray,
       maxIntensity: 200,
       opacity: .7,
       radius: getNewRadius(currentZoom)
@@ -75,6 +94,14 @@ function updateHeatMapData(numberOfDaysBack){
 }
 
 function getServerData(numberOfDaysBack){
+  var ne = bounds.getNorthEast(); // LatLng of the north-east corner
+  console.log(ne);
+  var sw = bounds.getSouthWest(); // LatLng of the south-west corder
+  console.log(sw);
+  var nw = new google.maps.LatLng(ne.lat(), sw.lng());
+  console.log(nw);
+  var se = new google.maps.LatLng(sw.lat(), ne.lng());
+  console.log(se);
   // here i will call geocode and return the location on the
   // world so i know where to load the data for
   // SENSOR_COLLECTION_REGION_DATATYPE_JULIANDAY
@@ -269,24 +296,3 @@ function stopLoading(id){
   var element = document.getElementById(id);
   element.style.display = "none";
 }
-
-
-// function getLocation() {
-//   if (navigator.geolocation) {
-//     navigator.geolocation.getCurrentPosition(showPosition, cantGetLocation);
-//   } else {
-//     showMap(36.7783, -119.4179);
-//   }
-// }
-//
-// function showPosition(position) {
-//   currentLat = position.coords.latitude;
-//   currentLng = position.coords.longitude;
-//   console.log(position);
-//   showMap(currentLat, currentLng);
-//
-// }
-
-// function cantGetLocation(){
-//   showMap(36.7783, -119.4179);
-// }
