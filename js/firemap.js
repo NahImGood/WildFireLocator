@@ -76,7 +76,7 @@ function loadMapData(numberOfDaysBack){
      heatmap.setMap(null);
      currentZoom = map.getZoom();
      heatmap = new google.maps.visualization.HeatmapLayer({
-         data: pointArray,
+         data: serverData[numberOfDaysBack],
          maxIntensity: 200,
          opacity: .7,
          radius: getNewRadius(currentZoom)
