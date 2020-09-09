@@ -69,7 +69,7 @@ function loadMapData(numberOfDaysBack){
          opacity: .7,
          radius: getNewRadius(currentZoom)
        });
-       getServerData(true, numberOfDaysBack);
+       // getServerData(true, numberOfDaysBack);
    });
 
    google.maps.event.addListener(map, 'maptypeid_changed', function () {
@@ -85,9 +85,6 @@ function loadMapData(numberOfDaysBack){
    });
    google.maps.event.addListener(map, 'idle', function(ev){
      // bounds = map.getBounds();
-     if(!intialLoad){
-        getServerData(true, 0);
-     }
    });
    google.maps.event.addListener(map, 'tilesloaded', function(ev){
      bounds = map.getBounds();
