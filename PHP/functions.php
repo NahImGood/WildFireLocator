@@ -1,17 +1,22 @@
 <?php
 
 
-function convertCSVToArray($fileName){
+function convertCSVToArray($fileName, $bounds){
+
   $csv= file_get_contents($fileName);
   $array = array_map("str_getcsv", explode("\n", $csv));
   $returnArray = array();
   // removes header
   array_splice($array, 0, 1);
 
+
   foreach($array as $key => $item){
+
     //checks to make sure the offset is set
     if(isset($item[0])){
-      if(InsideOrNot($item[0], $item[1], $bounds) == 1){
+
+      if(FindPoint( $bounds['swlat'], $bounds['nelon'], $bounds['nwlat'],
+                    $bounds['nwlon'], $item[0], $item[1])){
         $tempArry['latitude'] = $item[0];
         $tempArry['longitude'] = $item[1];
         $tempArry['bright_ti4'] = $item[2];
@@ -27,6 +32,7 @@ function convertCSVToArray($fileName){
         $tempArry['daynight'] = $item[12];
         array_push($returnArray, $tempArry);
       }
+
     }
   }
   return $returnArray;
@@ -37,21 +43,35 @@ function convertCSVToJSONAndSend($array){
   print_r($json);
 }
 
-function InsideOrNot($lat, $lon, $bounds){
-    //If 0 is within |----| (|--0--|)
-    if($lon > $bounds['nwlon'] && $lon < $bounds['nelon']){
-        //if 0 is within ___
-        //                |
-        //               ___
-        if($lat < $bounds['nwlat'] && $lat > $bounds['swlat']){
-            return 1;
-        }else{
-            return 0;
-        }
+function FindPoint($x1, $y1, $x2, $y2, $x, $y){
+      $x =  (float)($x);
+      $y =  (float)($y);
 
-    }else{
-        return 0;
+      // echo "X: ";
+      // print_r($x1);
+      // echo " - ";
+      // print_r($xx);
+      // echo " - ";
+      // print_r($x2);
+      // echo "<br>";
+      // echo "Y: ";
+      // print_r($y1);
+      // echo " - ";
+      // print_r($y);
+      // echo " - ";
+      // print_r($y2);
+      // echo "<br>";
+      // echo "<br>";
+
+    if ($x > $x1 and $x < $x2){
+      //echo "x";
+        if(abs($y) > abs($y1) and abs($y) < abs($y2)){
+          return true;
+        }
     }
+
+
+    return false;
 }
 
 ?>
