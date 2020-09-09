@@ -222,7 +222,7 @@ function csvJSON(dataString, handleData){
     // url: "../firedata/data.csv",
     async: true,
     success: function (data) {
-        // console.log(csvd);
+        console.log(data);
         // Used when a CSV was being used.
         //data = $.csv.toObjects(csvd);
         // will return data to user.
