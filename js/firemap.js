@@ -10,9 +10,11 @@ var serverData = new Array(6);
 var allowedTimed = new Array(6);
 var rawServerData = new Array(6);
 var intialLoad;
+var bounds;
 
 function initMap(){
-  loadMapData(numberOfDaysBack);
+  getLocation();
+
 }
 
 function getLocation(){
@@ -26,11 +28,13 @@ function getLocation(){
 function showPosition(position) {
   currentLat = position.coords.latitude;
   currentLng = position.coords.longitude;
+  loadMapData(0);
 }
 
 function cantGetLocation(){
   currentLat = 36.7783;
   currentLng = -119.4179;
+  loadMapData(0);
 }
 
 function loadMapData(numberOfDaysBack){
@@ -42,15 +46,6 @@ function loadMapData(numberOfDaysBack){
   };
 
   map = new google.maps.Map(document.getElementById('fireMap'), mapOptions);
-
-  getServerData(0);
-
-
-  // if(serverData[numberOfDaysBack]){
-  //     var pointArray = new google.maps.MVCArray(serverData[numberOfDaysBack]);
-  // } else {
-  //   alert("Missing Data");
-  // }
 
   currentZoom = map.getZoom();
   heatmap = new google.maps.visualization.HeatmapLayer({
@@ -71,6 +66,7 @@ function loadMapData(numberOfDaysBack){
          opacity: .7,
          radius: getNewRadius(currentZoom)
        });
+
    });
 
    google.maps.event.addListener(map, 'maptypeid_changed', function () {
@@ -84,7 +80,20 @@ function loadMapData(numberOfDaysBack){
      });
      heatmap.setMap(map);
    });
+   google.maps.event.addListener(map, 'idle', function(ev){
+     bounds = map.getBounds();
+   });
+   waitForMapToLoad();
 
+}
+// waits for the map to load and then loads the lat and long so we can use that to get the correct data from the server.
+function waitForMapToLoad(){
+  if(typeof bounds !== "undefined"){
+       getServerData(0);
+   }
+   else{
+       setTimeout(waitForMapToLoad, 250);
+   }
 }
 
 function updateHeatMapData(numberOfDaysBack){
@@ -94,34 +103,24 @@ function updateHeatMapData(numberOfDaysBack){
 }
 
 function getServerData(numberOfDaysBack){
-  var ne = bounds.getNorthEast(); // LatLng of the north-east corner
-  console.log(ne);
-  var sw = bounds.getSouthWest(); // LatLng of the south-west corder
-  console.log(sw);
-  var nw = new google.maps.LatLng(ne.lat(), sw.lng());
-  console.log(nw);
-  var se = new google.maps.LatLng(sw.lat(), ne.lng());
-  console.log(se);
-  // here i will call geocode and return the location on the
-  // world so i know where to load the data for
+  console.log(bounds);
+  var boundsURL = buildBoundsURL();
+
   // SENSOR_COLLECTION_REGION_DATATYPE_JULIANDAY
   var jDate = getJulianDate(numberOfDaysBack);
   // Set up of the date formate
                 //J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_2020241
   var csvToGet = "J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_"+jDate;
   console.log(csvToGet);
+  var url = csvToGet + boundsURL;
+  console.log(url);
   if(serverData[numberOfDaysBack] == null) {
-      csvJSON(csvToGet, function( handleData){
+      csvJSON(url, function( handleData){
         rawServerData[numberOfDaysBack] = handleData;
         var preppedData = prepMapData(handleData, numberOfDaysBack);
         serverData[numberOfDaysBack] = preppedData;
         console.log("LoadMapData ServerData");
-        if(intialLoad == true){
-          console.log("InitalLoad");
-          loadMapData(numberOfDaysBack);
-        } else {
-          updateHeatMapData(numberOfDaysBack);
-        }
+        updateHeatMapData(numberOfDaysBack);
       });
     }
     else {
@@ -131,10 +130,25 @@ function getServerData(numberOfDaysBack){
 
 }
 
+function buildBoundsURL(){
+  var ne = bounds.getNorthEast(); // LatLng of the north-east corner
+  var sw = bounds.getSouthWest(); // LatLng of the south-west corder
+  var nw = new google.maps.LatLng(ne.lat(), sw.lng());
+  var se = new google.maps.LatLng(sw.lat(), ne.lng());
+
+  return "&?nelat="+ne.lat()+
+          "&?nelon="+ne.lng()+
+          "&?swlat="+sw.lat()+
+          "&?swlon="+sw.lng()+
+          "&?nwlat="+nw.lat()+
+          "&?nwlon="+nw.lng()+
+          "&?selat="+se.lat()+
+          "&?selon="+se.lng();
+}
+
 function showDynamicDataFromDate(daysFromToday){
     startLoading("dateLoader");
     getServerData(daysFromToday);
-
 }
 
 function showDynamicDataFromTime(time, daysFromToday){
