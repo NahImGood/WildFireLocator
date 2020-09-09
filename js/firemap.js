@@ -219,6 +219,7 @@ function prepMapData(json, numberOfDaysBack){
 function csvJSON(dataString, handleData){
   $.ajax({
     url: "http://wildfirelocator.com/PHP/return_json_from_file.php?fileName="+dataString,
+    type: "GET",
     // url: "../firedata/data.csv",
     async: true,
     success: function (data) {
