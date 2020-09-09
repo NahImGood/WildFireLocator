@@ -11,6 +11,7 @@ var allowedTimed = new Array(6);
 var rawServerData = new Array(6);
 var intialLoad;
 var bounds;
+var numberOfDaysBack = 0;
 
 function initMap(){
   getLocation();
@@ -82,6 +83,7 @@ function loadMapData(numberOfDaysBack){
    });
    google.maps.event.addListener(map, 'idle', function(ev){
      bounds = map.getBounds();
+     getServerData(numberOfDaysBack);
    });
    waitForMapToLoad();
 
@@ -148,6 +150,7 @@ function buildBoundsURL(){
 
 function showDynamicDataFromDate(daysFromToday){
     startLoading("dateLoader");
+    numberOfDaysBack = daysFromToday;
     getServerData(daysFromToday);
 }
 
