@@ -46,10 +46,7 @@ function convertCSVToJSONAndSend($array){
 function FindPoint($x1, $y1, $x2, $y2, $x, $y){
       $x =  (float)($x);
       $y =  (float)($y);
-      // $x1 =  (float)($x1);
-      // $y1 =  (float)($y1);
-      // $x2 =  (float)($x2);
-      // $y2 =  (float)($y2);
+
 
     if ($x > $x1 and $x < $x2){
       //echo "x";

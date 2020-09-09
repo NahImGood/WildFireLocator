@@ -10,7 +10,7 @@ var serverData = new Array(6);
 var allowedTimed = new Array(6);
 var rawServerData = new Array(6);
 var jsonServerData = new Array(6);
-var intialLoad;
+var intialLoad = true;
 var bounds;
 var numberOfDaysBack = 0;
 var checkIfLoadIsNeededArray = new Array(6);
@@ -85,6 +85,9 @@ function loadMapData(numberOfDaysBack){
    });
    google.maps.event.addListener(map, 'idle', function(ev){
      // bounds = map.getBounds();
+     if(!intialLoad){
+        getServerData(true, 0);
+     }
    });
    google.maps.event.addListener(map, 'tilesloaded', function(ev){
      bounds = map.getBounds();
@@ -123,11 +126,9 @@ function getServerData(zoomchanged, numberOfDaysBack){
         rawServerData[numberOfDaysBack] = handleData;
         var preSortedData = rawServerData[numberOfDaysBack];
         var data = JSON.parse(preSortedData);
-        jsonServerData[numberOfDaysBack] = data;
-        jsonServerData[numberOfDaysBack] = arrUnique(jsonServerData[numberOfDaysBack]);
         var preppedData = prepMapData(handleData, numberOfDaysBack);
         serverData[numberOfDaysBack] = preppedData;
-        console.log(preppedData);
+
         console.log("LoadMapData ServerData");
         updateHeatMapData(numberOfDaysBack);
 
@@ -137,18 +138,6 @@ function getServerData(zoomchanged, numberOfDaysBack){
       updateHeatMapData(numberOfDaysBack);
     }
 
-}
-
-function arrUnique(arr) {
-    var cleaned = [];
-    arr.forEach(function(itm) {
-        var unique = true;
-        cleaned.forEach(function(itm2) {
-            if (_.isEqual(itm, itm2)) unique = false;
-        });
-        if (unique)  cleaned.push(itm);
-    });
-    return cleaned;
 }
 
 function buildBoundsURL(){
