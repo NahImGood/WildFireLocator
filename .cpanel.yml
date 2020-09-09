@@ -3,8 +3,8 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/j9u9o9v53omg/public_html/
     - /bin/cp home.html $DEPLOYPATH
-    - /bin/cp css $DEPLOYPATH
-    - /bin/cp PHP $DEPLOYPATH
-    - /bin/cp css $DEPLOYPATH
-    - /bin/cp js $DEPLOYPATH
-    - /bin/cp heatmap $DEPLOYPATH
+    - /bin/cp -R css $DEPLOYPATH
+    - /bin/cp -R PHP $DEPLOYPATH
+    - /bin/cp -R css $DEPLOYPATH
+    - /bin/cp -R js $DEPLOYPATH
+    - /bin/cp -R heatmap $DEPLOYPATH
