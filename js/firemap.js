@@ -115,12 +115,11 @@ function getServerData(zoomchanged, numberOfDaysBack){
   if(serverData[numberOfDaysBack] == null || zoomchanged) {
       csvJSON(url, function( handleData){
         rawServerData[numberOfDaysBack] = handleData;
-        rawServerData[numberOfDaysBack] = removeDuplicates(rawServerData[numberOfDaysBack]);
         var preppedData = prepMapData(handleData, numberOfDaysBack);
         serverData[numberOfDaysBack] = preppedData;
         serverData[numberOfDaysBack] = removeDuplicates(serverData[numberOfDaysBack]);
         console.log("LoadMapData ServerData");
-        updateHeatMapData(numberOfDaysBack);
+        serverData[numberOfDaysBack](numberOfDaysBack);
       });
     }
     else {
