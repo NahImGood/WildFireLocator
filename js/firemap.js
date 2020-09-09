@@ -67,7 +67,6 @@ function loadMapData(numberOfDaysBack){
          opacity: .7,
          radius: getNewRadius(currentZoom)
        });
-
    });
 
    google.maps.event.addListener(map, 'maptypeid_changed', function () {
@@ -83,7 +82,7 @@ function loadMapData(numberOfDaysBack){
    });
    google.maps.event.addListener(map, 'idle', function(ev){
      bounds = map.getBounds();
-     getServerData(numberOfDaysBack);
+     getServerData(true, numberOfDaysBack);
    });
    waitForMapToLoad();
 
@@ -91,7 +90,7 @@ function loadMapData(numberOfDaysBack){
 // waits for the map to load and then loads the lat and long so we can use that to get the correct data from the server.
 function waitForMapToLoad(){
   if(typeof bounds !== "undefined"){
-       getServerData(0);
+       getServerData(false, 0);
    }
    else{
        setTimeout(waitForMapToLoad, 250);
@@ -104,8 +103,7 @@ function updateHeatMapData(numberOfDaysBack){
   heatmap.set('data', serverData[numberOfDaysBack]);
 }
 
-function getServerData(numberOfDaysBack){
-  console.log(bounds);
+function getServerData(zoomchanged, numberOfDaysBack){
   var boundsURL = buildBoundsURL();
 
   // SENSOR_COLLECTION_REGION_DATATYPE_JULIANDAY
@@ -113,10 +111,8 @@ function getServerData(numberOfDaysBack){
   // Set up of the date formate
                 //J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_2020241
   var csvToGet = "J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_"+jDate;
-  console.log(csvToGet);
   var url = csvToGet + boundsURL;
-  console.log(url);
-  if(serverData[numberOfDaysBack] == null) {
+  if(serverData[numberOfDaysBack] == null || zoomchanged) {
       csvJSON(url, function( handleData){
         rawServerData[numberOfDaysBack] = handleData;
         var preppedData = prepMapData(handleData, numberOfDaysBack);
@@ -151,7 +147,7 @@ function buildBoundsURL(){
 function showDynamicDataFromDate(daysFromToday){
     startLoading("dateLoader");
     numberOfDaysBack = daysFromToday;
-    getServerData(daysFromToday);
+    getServerData(false, daysFromToday);
 }
 
 function showDynamicDataFromTime(time, daysFromToday){
@@ -193,11 +189,8 @@ function formatTimeForView(time){
 }
 
 function getNewRadius(zoom){
-  console.log(zoom);
 
-  console.log((.02 * Math.pow(2,(20-zoom))))
   return (.02 * Math.pow(2,zoom));
-
 }
 
 function toggleHeatmap() {
