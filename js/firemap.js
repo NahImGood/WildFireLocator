@@ -138,17 +138,19 @@ function isLoadNeeded(numberOfDaysBack){
   var sw = bounds.getSouthWest(); // LatLng of the south-west corder
   var nw = new google.maps.LatLng(ne.lat(), sw.lng());
   var se = new google.maps.LatLng(sw.lat(), ne.lng());
+  if(checkIfLoadIsNeededArray[numberOfDaysBack].swlat){
+    var swlat = checkIfLoadIsNeededArray[numberOfDaysBack].swlat;
+    var nelon = checkIfLoadIsNeededArray[numberOfDaysBack].nelon;
+    var nwlat = checkIfLoadIsNeededArray[numberOfDaysBack].nwlat;
+    var nwlon = checkIfLoadIsNeededArray[numberOfDaysBack].nwlon;
 
-  var swlat = checkIfLoadIsNeededArray[numberOfDaysBack].swlat;
-  var nelon = checkIfLoadIsNeededArray[numberOfDaysBack].nelon;
-  var nwlat = checkIfLoadIsNeededArray[numberOfDaysBack].nwlat;
-  var nwlon = checkIfLoadIsNeededArray[numberOfDaysBack].nwlon;
-
-  if(swlat < sw.lat() && nelat < ne.lat()){
-    if(nwlon < nw.lng() && nelon < ne.lng()){
-      return true;
+    if(swlat < sw.lat() && nelat < ne.lat()){
+      if(nwlon < nw.lng() && nelon < ne.lng()){
+        return true;
+      }
     }
   }
+
   return false;
 }
 
