@@ -2,7 +2,9 @@
 ob_start('ob_gzhandler');
 
 require 'functions.php';
-$fileName = $_GET['fileName'];
+//$fileName = $_GET['fileName'];
+$fileName = "J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_2020248";
+
 $bounds = array();
 $bounds['nelat'] = $_GET['nelat'];
 $bounds['swlon'] = $_GET['swlon'];
