@@ -67,6 +67,7 @@ function loadMapData(numberOfDaysBack){
          opacity: .7,
          radius: getNewRadius(currentZoom)
        });
+      getServerData(true, numberOfDaysBack);
    });
 
    google.maps.event.addListener(map, 'maptypeid_changed', function () {
@@ -82,7 +83,6 @@ function loadMapData(numberOfDaysBack){
    });
    google.maps.event.addListener(map, 'idle', function(ev){
      bounds = map.getBounds();
-     getServerData(true, numberOfDaysBack);
    });
    waitForMapToLoad();
 
@@ -114,12 +114,14 @@ function getServerData(zoomchanged, numberOfDaysBack){
   var url = csvToGet + boundsURL;
   if(serverData[numberOfDaysBack] == null || zoomchanged) {
       csvJSON(url, function( handleData){
+
         rawServerData[numberOfDaysBack] = handleData;
         var preppedData = prepMapData(handleData, numberOfDaysBack);
         serverData[numberOfDaysBack] = preppedData;
-
+        console.log(preppedData);
         console.log("LoadMapData ServerData");
         updateHeatMapData(numberOfDaysBack);
+
       });
     }
     else {
@@ -127,14 +129,6 @@ function getServerData(zoomchanged, numberOfDaysBack){
       updateHeatMapData(numberOfDaysBack);
     }
 
-}
-
-function removeDuplicates(obj) {
-
-    jsonObject = obj.map(JSON.stringify);
-    uniqueSet = new Set(jsonObject);
-    uniqueArray = Array.from(uniqueSet).map(JSON.parse);
-    return uniqueArray;
 }
 
 function buildBoundsURL(){
@@ -243,7 +237,7 @@ function modulateGradient() {
 }
 
 function prepMapData(json, numberOfDaysBack){
-
+  // console.log(json);
   var data = JSON.parse(json);
   var max = data.length;
   var returnData = [];
