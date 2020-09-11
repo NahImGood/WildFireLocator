@@ -9,13 +9,11 @@
 <link rel="stylesheet" href="css/w3-css.css">
 <link rel="stylesheet" href="css/firemap.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-<script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
+<!-- Possible APIs Ill try due to pricing. -->
+<!-- <script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' /> -->
 <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmYQ6YIL0CuqQ5jRL9bopeiYjVX0ojk0M&libraries=visualization"></script>
-
-<script src="js/jquery.csv.js"></script>
 <script src="js/firemap.js"></script>
 <style>
 
@@ -26,30 +24,9 @@ body, html {
   line-height: 1.8;
 }
 
-/* Create a Parallax Effect */
-.bgimg-1 {
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-
-.w3-wide {letter-spacing: 10px;}
-.w3-hover-opacity {cursor: pointer;}
-
-/* Turn off parallax scrolling for tablets and phones */
-@media only screen and (max-device-width: 1600px) {
-  .bgimg-1 {
-    background-attachment: scroll;
-    min-height: 400px;
-  }
-}
-
-
 </style>
-<body onload="initMap()">
 
+<body onload="getLocation()">
 <div id = "mapDiv">
     <!-- <button onclick="changeGradient()">Change gradient</button>
     <button onclick="changeOpacity()">Change opacity</button> -->
@@ -66,8 +43,8 @@ body, html {
         <p>Time: <span id="timeValue">Slide To Start</span></p>
       </div> -->
     </div>
+    <!-- Fire Map -->
   <div id="fireMap">
-
  </div>
 </div>
 
@@ -77,47 +54,18 @@ body, html {
 
   var dateSlider = document.getElementById("dateRange");
   var dateValue = document.getElementById("dateValue");
+  // Time slider works, but the data updates once every 4-5 hours so
+  // the by time is not what i was expecting.
   // var timeSlider = document.getElementById("timeRange");
   // var timeValue = document.getElementById("timeValue");
   dateValue.innerHTML = dateSlider.value;
-
   dateSlider.oninput = function(){
     showDynamicDataFromDate(this.value);
   }
 
-
   // timeSlider.oninput = function(){
   //   showDynamicDataFromTime(this.value, dateSlider.value);
   // }
-
-  // Modal Image Gallery
-  function onClick(element) {
-    document.getElementById("img01").src = element.src;
-    document.getElementById("modal01").style.display = "block";
-    var captionText = document.getElementById("caption");
-    captionText.innerHTML = element.alt;
-  }
-
-// Change style of navbar on scroll
-window.onscroll = function() {myFunction()};
-function myFunction() {
-    var navbar = document.getElementById("myNavbar");
-    if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-        navbar.className = "w3-bar" + " w3-card" + " w3-animate-top" + " w3-white";
-    } else {
-        navbar.className = navbar.className.replace(" w3-card w3-animate-top w3-white", "");
-    }
-}
-
-// Used to toggle the menu on small screens when clicking on the menu button
-function toggleFunction() {
-    var x = document.getElementById("navDemo");
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-    } else {
-        x.className = x.className.replace(" w3-show", "");
-    }
-}
 
 </script>
 

@@ -1,16 +1,15 @@
 <?php
 
-
+// Converts the CSV into a php array
 function convertCSVToArray($fileName){
 
-  $csv= file_get_contents($fileName);
+  $csv = file_get_contents($fileName);
   $array = array_map("str_getcsv", explode("\n", $csv));
   $returnArray = array();
   // removes header
   array_splice($array, 0, 1);
 
   foreach($array as $key => $item){
-
     //checks to make sure the offset is set
     if(isset($item[0])){
         $tempArry['latitude'] = $item[0];
@@ -29,26 +28,27 @@ function convertCSVToArray($fileName){
         array_push($returnArray, $tempArry);
     }
   }
-  return $returnArray;
+  return $returnArray; // contains nice new data
 }
 
+// Encodes the json and sends it out.
 function convertCSVToJSONAndSend($array){
   $json = json_encode($array);
   print_r($json);
 }
 
-// function FindPoint($x1, $y1, $x2, $y2, $x, $y){
-//       $x =  (float)($x);
-//       $y =  (float)($y);
-//
-//
-//     if ($x > $x1 and $x < $x2){
-//       //echo "x";
-//         if(abs($y) > abs($y1) and abs($y) < abs($y2)){
-//           return true;
-//         }
-//     }
-//     return false;
-// }
+// checks to see if the point is within the bounds of the lat and long
+function FindPoint($x1, $y1, $x2, $y2, $x, $y){
+    $x =  (float)($x); // CSV data is a string at start
+    $y =  (float)($y);
+    if ($x > $x1 and $x < $x2){
+      // Is inside of Long
+        if(abs($y) > abs($y1) and abs($y) < abs($y2)){
+          // Disregard negative values
+          return true;
+        }
+    }
+    return false;
+}
 
 ?>

@@ -1,58 +1,58 @@
 // This example requires the Visualization library. Include the libraries=visualization
 // parameter when you first load the API. For example:
-// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
-var map, pointarray, heatmap;
-var gradient, gradientStep = -1;
-var currentLat;
+
+var map, pointarray, heatmap; // Sets globals to heat map
+var gradient, gradientStep = -1; // Keeping for when i add in gradient
+var currentLat; // grabs the center lat and long on loading from the navigator
 var currentLng;
-var currentZoom = 7;
+var currentZoom = 7; // inital zoom value
+// the data that been converted to google.maps location MVArray.
+// Used to populate heatmap layer
 var serverData = new Array(6);
-var allowedTimed = new Array(6);
-var rawServerData = new Array(6);
-var jsonServerData = new Array(6);
-var intialLoad = true;
-var bounds;
-var numberOfDaysBack = 0;
-var checkIfLoadIsNeededArray = new Array(6);
+var allowedTimed = new Array(6); // Checks the hours the data holders per day.
+var rawServerData = new Array(6); // Raw Server data For faster loading when scrolling thorough days
+var jsonServerData = new Array(6); // Not in use, Will take the place of server Data to be added and deduped for loading location based circles
+var intialLoad = true; //  if the map as been loaded initally for knowing when to update the heat map layer
+var bounds; //  bounds the map is currently showing (Lat and long)
+var numberOfDaysBack = 0; // number of days into the past you are looking at (MAx of 7 currenty)
 
-function initMap(){
-  getLocation();
-
-}
-
+// First function to loads, Asks for current location
 function getLocation(){
   if (navigator.geolocation) {
   return navigator.geolocation.getCurrentPosition(showPosition, cantGetLocation);
   } else {
     console.log("Get Location Not Available");
+    cantGetLocation();
   }
 }
 
+// Will get cuurrent lat and long and load the map
 function showPosition(position) {
   currentLat = position.coords.latitude;
   currentLng = position.coords.longitude;
   loadMapData(0);
 }
 
+// When you decline or the geolocation isnt available
 function cantGetLocation(){
   currentLat = 36.7783;
   currentLng = -119.4179;
   loadMapData(0);
 }
 
+// Loads the inital Map data
+// Takes the number of days into the past
 function loadMapData(numberOfDaysBack){
-  stopLoading("dateLoader");
+  // Creates the map that is held in fireMap Div
   var mapOptions = {
       zoom: currentZoom,
       center: new google.maps.LatLng(currentLat, currentLng),
       mapTypeId: google.maps.MapTypeId.SATELLITE,
   };
-
   map = new google.maps.Map(document.getElementById('fireMap'), mapOptions);
-
-  currentZoom = map.getZoom();
+  // Sets the heat map up with no data as the data is initally
+  // pulled from the server
   heatmap = new google.maps.visualization.HeatmapLayer({
-      //data: pointArray,
       maxIntensity: 200,
       opacity: .7,
       radius: getNewRadius(currentZoom)
@@ -64,14 +64,15 @@ function loadMapData(numberOfDaysBack){
   // then will run function at end of call
   // google.maps.event.addListenerOnce(map, 'tilesloaded', modulateGradient);
    google.maps.event.addListener(map, 'zoom_changed', function () {
+     // Makes sure the heatmap radius stays a constant size on the
+     // map for better data visualization
        currentZoom = map.getZoom();
        heatmap.setOptions({
          opacity: .7,
          radius: getNewRadius(currentZoom)
        });
-       // getServerData(true, numberOfDaysBack);
    });
-
+   // When the map type changes is tosses out the overlay so we create a new one and add it
    google.maps.event.addListener(map, 'maptypeid_changed', function () {
      heatmap.setMap(null);
      currentZoom = map.getZoom();
@@ -83,17 +84,22 @@ function loadMapData(numberOfDaysBack){
      });
      heatmap.setMap(map);
    });
+   // Once the map has stopped moving we update the current screen bounds
    google.maps.event.addListener(map, 'idle', function(ev){
-     // bounds = map.getBounds();
-   });
-   google.maps.event.addListener(map, 'tilesloaded', function(ev){
      bounds = map.getBounds();
-
    });
+   // waits for map to load so we can send screen bounds to the server
    waitForMapToLoad();
 
 }
-// waits for the map to load and then loads the lat and long so we can use that to get the correct data from the server.
+
+// Calculates radius based on a 350 M circle for data points
+function getNewRadius(zoom){
+  return (.02 * Math.pow(2,zoom));
+}
+
+// waits for the map to load and then loads the lat and long so
+// we can use that to get the correct data from the server.
 function waitForMapToLoad(){
   if(typeof bounds !== "undefined"){
        getServerData(false, 0);
@@ -102,57 +108,50 @@ function waitForMapToLoad(){
        setTimeout(waitForMapToLoad, 250);
    }
 }
-
+// Updates the heatmap with the new data
 function updateHeatMapData(numberOfDaysBack){
-  stopLoading("dateLoader");
-  console.log("Data Exists, Setting Data To Map");
+  stopLoading("dateLoader"); // stops small loader near data slider
   heatmap.set('data', serverData[numberOfDaysBack]);
 }
-
+// Calls the server data and buils the URL
 function getServerData(zoomchanged, numberOfDaysBack){
+  // Sets array bounds
   // var boundsURL = buildBoundsURL();
   // SENSOR_COLLECTION_REGION_DATATYPE_JULIANDAY
   var jDate = getJulianDate(numberOfDaysBack);
   // Set up of the date formate
                 //J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_2020241
   var csvToGet = "J1_VIIRS_C2_USA_contiguous_and_Hawaii_VJ114IMGTDL_NRT_"+jDate;
-  // var url = csvToGet + boundsURL;
+  // if the data doesnt exist we will call for the new data
   if(serverData[numberOfDaysBack] == null) {
       csvJSON(csvToGet, function( handleData){
-
+        // Raw server data is cached for the use in the time scroller
         rawServerData[numberOfDaysBack] = handleData;
-        var preSortedData = rawServerData[numberOfDaysBack];
-        var data = JSON.parse(preSortedData);
+        // Parse the data to be converted to google.location MVArray
         var preppedData = prepMapData(handleData, numberOfDaysBack);
         serverData[numberOfDaysBack] = preppedData;
-
-        console.log("LoadMapData ServerData");
+        // updates Heatmap layer
         updateHeatMapData(numberOfDaysBack);
-
       });
     }else {
       // data is in array and can be loaded into map
       updateHeatMapData(numberOfDaysBack);
     }
-
 }
 
+// Creates the url for getting bounds data
 function buildBoundsURL(){
   var ne = bounds.getNorthEast(); // LatLng of the north-east corner
   var sw = bounds.getSouthWest(); // LatLng of the south-west corder
   var nw = new google.maps.LatLng(ne.lat(), sw.lng());
-  var se = new google.maps.LatLng(sw.lat(), ne.lng());
 
-  return "&nelat="+ne.lat()+
-          "&nelon="+ne.lng()+
+  return  "&nelon="+ne.lng()+
           "&swlat="+sw.lat()+
-          "&swlon="+sw.lng()+
           "&nwlat="+nw.lat()+
-          "&nwlon="+nw.lng()+
-          "&selat="+se.lat()+
-          "&selon="+se.lng();
+          "&nwlon="+nw.lng();
 }
-
+// When the slider changes date the data is checked if it exists
+// and then either called for or updates the heatmap
 function showDynamicDataFromDate(daysFromToday){
     startLoading("dateLoader");
     numberOfDaysBack = daysFromToday;
@@ -162,35 +161,37 @@ function showDynamicDataFromDate(daysFromToday){
       updateHeatMapData(daysFromToday);
     }
 }
-
+// NOT IN USE
+// Shows hour by hour updates of fires
 function showDynamicDataFromTime(time, daysFromToday){
-  var preSortedData = rawServerData[daysFromToday];
-  var data = JSON.parse(preSortedData);
+  // Data to show for the hour
+  var data = JSON.parse(rawServerData[daysFromToday]);
+  // times where the data has been updated in the day
   var timesForThatDay = allowedTimed[daysFromToday];
+  // Update the time value for user view
   var timeValue = document.getElementById("timeRange");
   timeValue.max = timesForThatDay.length - 1;
-
+  // Formates from military to std view
   formatTimeForView(timesForThatDay[time]);
-
-  console.log(timesForThatDay);
-
+  // data is prepped differntly, Contains time constraint
   prepTimeDataForHeatMap(timesForThatDay[time], data);
 }
-
+// Loads the values for the time data to be updated
 function prepTimeDataForHeatMap(time, data){
-  console.log(time);
   var returnData = [];
   for (i = 0; i < data.length; i++) {
     if(data[i].acq_time.substr(0, 2) == time){
+      // value of how hot the fires are (NASA Calculated)
       var frp = 10 * data[i].frp;
       returnData.push(
         { location: new google.maps.LatLng(data[i].latitude, data[i].longitude), weight: frp }
       )
     }
-  }
+  } // Sets the data directly using a calculated data set
   heatmap.set('data', returnData);
 }
 
+// Formates the time for the user view
 function formatTimeForView(time){
   var dateValue = document.getElementById("timeValue");
   if(time > 12){
@@ -201,51 +202,7 @@ function formatTimeForView(time){
   }
 }
 
-function getNewRadius(zoom){
-
-  return (.02 * Math.pow(2,zoom));
-}
-
-function toggleHeatmap() {
-  heatmap.setMap(heatmap.getMap() ? null : map);
-}
-
-function setGradient() {
-    gradient = [
-        'rgba(0, 255, 255, 0)',
-        'rgba(0, 255, 255, 1)',
-        'rgba(0, 191, 255, 1)',
-        'rgba(0, 127, 255, 1)',
-        'rgba(0, 63, 255, 1)',
-        'rgba(0, 0, 255, 1)',
-        'rgba(0, 0, 223, 1)',
-        'rgba(0, 0, 191, 1)',
-        'rgba(0, 0, 159, 1)',
-        'rgba(0, 0, 127, 1)',
-        'rgba(63, 0, 91, 1)',
-        'rgba(127, 0, 63, 1)',
-        'rgba(191, 0, 31, 1)',
-        'rgba(255, 0, 0, 1)'
-    ];
-    heatmap.set('gradient', gradient);
-}
-
-function modulateGradient() {
-    var modulator = function() {
-        var newGradient = gradient.slice(0, heatmap.get('gradient').length + gradientStep);
-
-        if (newGradient.length == gradient.length || newGradient.length == 7) {
-            gradientStep *= -1;
-        }
-
-        heatmap.set('gradient', newGradient);
-
-        setTimeout(modulator, 500);
-    };
-
-    setTimeout(modulator, 500);
-}
-
+// Preps data for view in heatmap MVArray
 function prepMapData(json, numberOfDaysBack){
   // console.log(json);
   var data = JSON.parse(json);
@@ -273,16 +230,14 @@ function csvJSON(dataString, handleData){
     // url: "../firedata/data.csv",
     async: true,
     success: function (data) {
-        // Used when a CSV was being used.
-        //data = $.csv.toObjects(csvd);
-        // will return data to user.
         handleData(data);
       }
   });
 }
 
-// Start of functions for getting data //
+// Start of functions for getting data
 // returns formatted julian date
+// Not Very fun to make, Julian dates are not fun....
 function getJulianDate(numberOfDaysBack){
   var dateValue = document.getElementById("dateValue");
 
