@@ -18,6 +18,7 @@ var numberOfDaysBack = 0; // number of days into the past you are looking at (MA
 
 // First function to loads, Asks for current location
 function getLocation(){
+
   if (navigator.geolocation) {
   return navigator.geolocation.getCurrentPosition(showPosition, cantGetLocation);
   } else {
@@ -52,11 +53,16 @@ function loadMapData(numberOfDaysBack){
   map = new google.maps.Map(document.getElementById('fireMap'), mapOptions);
   // Sets the heat map up with no data as the data is initally
   // pulled from the server
-  heatmap = new google.maps.visualization.HeatmapLayer({
-      maxIntensity: 200,
-      opacity: .7,
-      radius: getNewRadius(currentZoom)
-  });
+
+    const centerControlDiv = document.createElement("mainMenu");
+    menuControls(centerControlDiv, map);
+    map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(centerControlDiv);
+
+    heatmap = new google.maps.visualization.HeatmapLayer({
+        maxIntensity: 200,
+        opacity: .7,
+        radius: getNewRadius(currentZoom)
+    });
   heatmap.setMap(map);
   // will change the gradiant to a negative
   // setGradient();
@@ -91,6 +97,34 @@ function loadMapData(numberOfDaysBack){
    // waits for map to load so we can send screen bounds to the server
    waitForMapToLoad();
 
+}
+
+function menuControls(controlDiv, map) {
+  // Set CSS for the control border.
+  const controlUI = document.createElement("div");
+  controlUI.style.backgroundColor = "#fff";
+  controlUI.style.border = "2px solid #fff";
+  controlUI.style.borderRadius = "3px";
+  controlUI.style.boxShadow = "0 2px 6px rgba(0,0,0,.3)";
+  controlUI.style.cursor = "pointer";
+  controlUI.style.marginBottom = "22px";
+  controlUI.style.textAlign = "center";
+  controlUI.title = "Menu";
+  controlDiv.appendChild(controlUI);
+  // Set CSS for the control interior.
+  const controlText = document.createElement("div");
+  controlText.style.color = "rgb(25,25,25)";
+  controlText.style.fontFamily = "Roboto,Arial,sans-serif";
+  controlText.style.fontSize = "16px";
+  controlText.style.lineHeight = "38px";
+  controlText.style.paddingLeft = "5px";
+  controlText.style.paddingRight = "5px";
+  controlText.innerHTML = "Open Menu";
+  controlUI.appendChild(controlText);
+  // Setup the click event listeners: simply set the map to Chicago.
+  controlUI.addEventListener("click", () => {
+    openNav(controlText);
+  });
 }
 
 // Calculates radius based on a 350 M circle for data points
