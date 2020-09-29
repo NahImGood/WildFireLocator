@@ -42,7 +42,7 @@ body {
   position: absolute;
   padding:10px;
   left: 0;
-  top: 0;
+  top: 30px;
 }
 
 @media screen and (max-height: 450px) {
